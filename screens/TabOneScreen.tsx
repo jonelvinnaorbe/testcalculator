@@ -111,7 +111,8 @@ export default function TabOneScreen({ navigation }: RootTabScreenProps<'TabOne'
   useEffect(() => {
     setCompleteInput(input1 + operation + input2);
     if(numType == "roman" && input1){
-      setRomanText(convertToRoman(input1) + operation + convertToRoman(input2));
+      //setRomanText(convertToRoman(input1) + operation + convertToRoman(input2));
+      setRomanText(convertToRoman(input1.substring(0, input1.indexOf('.'))) + operation + convertToRoman(input2.substring(0, input2.indexOf('.'))));
     }
   }, [input1, input2, operation, numType])
 
