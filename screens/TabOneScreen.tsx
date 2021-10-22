@@ -81,23 +81,37 @@ export default function TabOneScreen({ navigation }: RootTabScreenProps<'TabOne'
   ]
 
   const onOperation = (value) => {
-    setOperation(value)
+    if (input1) {
+      setOperation(value)
+    }
   }
 
   const onNum = (value) => {
     if (!operation) {
       setInput1(input1 + value.arabic)
     } else {
-      setInput2(input2 + value.arabic)
+      if (Number(input2 + value.arabic) > Number(input1) && numType == "roman" && operation == "/") {
+        setInput2('')
+        alert('Input 2 cannot be larger on roman numeral type')
+      } else {
+        setInput2(input2 + value.arabic)
+      }
     }
   }
 
   const onCompute = () => {
-    const total = eval(String(completeInput)).toFixed(2);
-    setCompleteInput(String(total));
-    setInput1(total)
-    setInput2('')
-    setOperation('')
+    if(input1 < input2 && operation == "/" && numType == "roman"){
+      alert('Input 2 cannot be larger on roman numeral type');
+      setInput2('')
+      return
+    }
+    if (input1 && input2) {
+      const total = eval(String(completeInput)).toFixed(2);
+      setCompleteInput(String(total));
+      setInput1(total)
+      setInput2('')
+      setOperation('')
+    }
   }
 
   const clearFields = () => {
@@ -110,11 +124,23 @@ export default function TabOneScreen({ navigation }: RootTabScreenProps<'TabOne'
 
   useEffect(() => {
     setCompleteInput(input1 + operation + input2);
-    if(numType == "roman" && input1){
-      //setRomanText(convertToRoman(input1) + operation + convertToRoman(input2));
-      setRomanText(convertToRoman(input1.substring(0, input1.indexOf('.'))) + operation + convertToRoman(input2.substring(0, input2.indexOf('.'))));
+    if (numType == "roman") {
+      console.log('setroman');
+      var input1Value = input1
+      if(input1.indexOf('.') == 1){
+        input1Value = input1.substring(0, input1.indexOf('.'));
+      }
+      setRomanText(convertToRoman(input1Value) + operation + convertToRoman(input2));
     }
   }, [input1, input2, operation, numType])
+
+  useEffect(() => {
+    console.log(input1, input2, operation, numType);
+    if (Number(input1) < 1 && numType == "roman") {
+      setInput1('');
+      setRomanText('')
+    }
+  }, [numType])
 
   return (
     <View style={styles.container}>
@@ -128,7 +154,7 @@ export default function TabOneScreen({ navigation }: RootTabScreenProps<'TabOne'
         }}>
           <Text style={styles.buttonText}>Switch to: {numType == "arabic" ? "Roman" : "Arabic"}</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={{...styles.button, backgroundColor: 'gray'}} onPress={() => clearFields()}>
+        <TouchableOpacity style={{ ...styles.button, backgroundColor: 'gray' }} onPress={() => clearFields()}>
           <Text style={styles.buttonText}>Clear</Text>
         </TouchableOpacity>
         <TextInput style={styles.resultInput}
